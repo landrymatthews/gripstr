@@ -69,11 +69,11 @@ class Helicopter(object):
 
 		# here we change the value of speed to depend on the joint
             if self.moving_up:
-		# normalizing
-		# max_joint_angle = 60
+		# normalizing 0-60 degrees from the servo to 8-15 speed for the chopper
+		# max_servo_angle = 60
 		# min_grip_speed = 8
 		# max_grip_speed = 15
-		# grip_speed = (max_grip_speed-min_grip_speed)*(servoAngle / max_joint_angle) + min_grip_speed;
+		# grip_speed = (max_grip_speed-min_grip_speed)*(servoAngle / max_servo_angle) + min_grip_speed;
 		# self.y -= grip_speed
                 self.y -= speed # this will be removed once the above line is uncommented out 
 
