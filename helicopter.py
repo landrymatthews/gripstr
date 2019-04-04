@@ -2,7 +2,8 @@
 # https://github.com/coregameHD/Cavecopter
 # Forked from andreasroald/helicopter-game
 import sprites
-
+import serial
+global arduino = serial.Serial("/dev/ttyACMO", timeout=1, baudrate=9600)
 class Helicopter(object):
     health = 3
 
@@ -59,23 +60,21 @@ class Helicopter(object):
 
     def movement(self):
         speed = 6
+	servoAngle = int(arduino.readLine())
         if not self.wreck_start:
             if (self.moving_up and self.moving_left) or (self.moving_down and self.moving_left):
                 speed *= 0.707
             if (self.moving_up and self.moving_right) or (self.moving_down and self.moving_right):
                 speed *= 0.707
 
-			# here we change the value of speed to depend on the joint
+		# here we change the value of speed to depend on the joint
             if self.moving_up:
-				# normalizing
-				# max_joint_angle = 60
-				# min_grip_speed = 8
-				# max_grip_speed = 15
-				# grip_speed = (max_grip_speed-min_grip_speed)*(i / max_joint_angle) + min_grip_speed;
-				# self.y -= grip_speed
-
-
-				# self.y = grip_speed
+		# normalizing
+		# max_joint_angle = 60
+		# min_grip_speed = 8
+		# max_grip_speed = 15
+		# grip_speed = (max_grip_speed-min_grip_speed)*(servoAngle / max_joint_angle) + min_grip_speed;
+		# self.y -= grip_speed
                 self.y -= speed # this will be removed once the above line is uncommented out 
 
 
