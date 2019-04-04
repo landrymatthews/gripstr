@@ -1,11 +1,15 @@
     
 #include <Servo.h>
+#include <SoftwareSerial.h>
 
+SoftwareSerial mySerial(0, 1);
 Servo myservo;
 int flexiForcePin = 0;
+
 void setup() {
   Serial.begin(9600);
   myservo.attach(9);
+  mySerial.begin(9600);
 }
 
 void loop() {
@@ -17,8 +21,7 @@ void loop() {
   float min_angle = 0;
   float max_angle = 60;
   float servo_angle = (max_angle-min_angle)*(current_sensor_value / max_sensor_value) + min_angle;
-  
-
   myservo.write(servo_angle);
   Serial.println(servo_angle);
+  mySerial.write(servo_angle);
 }
