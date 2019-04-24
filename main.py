@@ -4,7 +4,10 @@
 import pygame, random
 from pygame.locals import *
 import helicopter, enemy_heli, sprites
+import serial
+import json
 
+arduino = serial.Serial("/dev/ttyUSB0", timeout=1, baudrate=9600)
 # pygame __init__
 pygame.init()
 
@@ -26,7 +29,7 @@ ALERTFONT = 'fonts/8-Bit-Madness.ttf'
 def message_to_screen(message, textfont, size, color):
     my_font = pygame.font.Font(textfont, size)
     my_message = my_font.render(message, 0, color)
-    
+
     return my_message
 
 # colors setting
@@ -114,7 +117,7 @@ def main_menu():
                     if selected == "quit":
                         pygame.quit()
                         quit()
-                        
+
         # main menu background
         DISPLAYSURF.blit(sprites.mainmenu_background, (0, 0))
 
@@ -245,11 +248,11 @@ def game_loop():
                             bullets = []
 
                             game_loop()
-                            
+
                         if game_over_selected == "quit":
                             pygame.quit()
                             quit()
-                            
+
             # game over screen
             game_over_text = message_to_screen("GAME OVER", MAINFONT, 72, BLACK)
             game_over_caption = message_to_screen("TRY AGAIN?", MAINFONT, 36, BLACK)
@@ -277,6 +280,31 @@ def game_loop():
             FPSCLOCK.tick(10)
 
         # event handler
+        if moving:
+            buffer = ''
+            while not buffer.endswith('\n'):
+                try:
+                    buffer += arduino.read()
+                    readin = json.loads(buffer)
+                    print(readin)
+                    buffer=''
+                except:
+                    print "error json"
+            #readin = arduino.readline().rstrip().rstrip("\r")
+            if readin: 
+                servoAngle = int(readin)
+            else:
+                servoAngle = 0
+            print "from main"
+            print servoAngle
+            if servoAngle > 0:
+                #if event.type == pygame.MOUSEBUTTONDOWN:
+                player.moving_up = True
+                player.moving_down = False
+            if servoAngle == 0:
+                #if event.type == pygame.MOUSEBUTTONUP:
+                player.moving_up = False
+                player.moving_down = True
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 if score > highscore_int:
@@ -285,24 +313,13 @@ def game_loop():
                     highscore_file.close()
                 pygame.quit()
                 quit()
-                
+
             # player move
             '''
             1. click and hold left mouse to go up
             2. release to go down
             '''
             left_click = 1
-            if moving:
-				# if servo_angle > 0:
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == left_click:
-						
-                        player.moving_up = True
-                    player.moving_down = False
-				# if servo_angle == 0:
-                if event.type == pygame.MOUSEBUTTONUP:
-                    player.moving_up = False
-                    player.moving_down = True
 
         if player.health < 1:
             pygame.mixer.Sound.play(explosion)
@@ -310,7 +327,7 @@ def game_loop():
 
         if player.wrecked:
             game_over = True
-        
+
         # scrolling background
         DISPLAYSURF.blit(sprites.bg1, (background_width, 0))
         DISPLAYSURF.blit(sprites.bg2, (background_width - 1920, 0))
@@ -318,7 +335,7 @@ def game_loop():
             background_width -= 6
         elif score < hard_mode:
             background_width -= 2
-            
+
         if background_width <= 0:
             background_width = 1920
 
@@ -372,7 +389,7 @@ def game_loop():
         else:
             if missile_spawn_num == 50 and not missile_alive and score > 150:
                 warning = True
-                
+
         # show warning before missile spawning
         if warning:
             if warning_once:
@@ -429,7 +446,7 @@ def game_loop():
                 if player.health < 3:
                     player.health += 1
                 red_heart_x = 800-870
-                
+
         # player-enemy helicopter collision detection
         for hit_player in enemy_heli.bullets:
             if player.x < hit_player[0] < player.x+100 or player.x < hit_player[0]+40 < player.x+100:
@@ -479,7 +496,7 @@ def game_loop():
                 DISPLAYSURF.blit(sprites.icon, (52, 10))
                 if player.health >= 3:
                     DISPLAYSURF.blit(sprites.icon, (94, 10))
-                    
+
         # draw spikes at the buttom of the screen
         DISPLAYSURF.blit(sprites.spikes, (0, 500))
 

@@ -3,7 +3,7 @@
 # Forked from andreasroald/helicopter-game
 import sprites
 import serial
-global arduino = serial.Serial("/dev/ttyACMO", timeout=1, baudrate=9600)
+arduino = serial.Serial("/dev/ttyUSB0", timeout=1, baudrate=9600)
 class Helicopter(object):
     health = 3
 
@@ -60,7 +60,9 @@ class Helicopter(object):
 
     def movement(self):
         speed = 6
-	servoAngle = int(arduino.readLine())
+	servoAngle = 7
+	#servoAngle = int(arduino.readline().rstrip().rstrip("\r"))
+        #print servoAngle
         if not self.wreck_start:
             if (self.moving_up and self.moving_left) or (self.moving_down and self.moving_left):
                 speed *= 0.707
@@ -70,11 +72,11 @@ class Helicopter(object):
 		# here we change the value of speed to depend on the joint
             if self.moving_up:
 		# normalizing 0-60 degrees from the servo to 8-15 speed for the chopper
-		# max_servo_angle = 60
-		# min_grip_speed = 8
-		# max_grip_speed = 15
-		# grip_speed = (max_grip_speed-min_grip_speed)*(servoAngle / max_servo_angle) + min_grip_speed;
-		# self.y -= grip_speed
+		max_servo_angle = 60
+		min_grip_speed = 8
+		max_grip_speed = 15
+		grip_speed = (max_grip_speed-min_grip_speed)*(servoAngle / max_servo_angle) + min_grip_speed;
+		#self.y -= grip_speed
                 self.y -= speed # this will be removed once the above line is uncommented out 
 
 
