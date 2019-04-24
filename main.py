@@ -282,9 +282,10 @@ def game_loop():
         # event handler
         if moving:
             buffer = ''
+            readin = 0
             while not buffer.endswith('\n'):
                 try:
-                    buffer += arduino.read()
+                    buffer = arduino.readline()
                     readin = json.loads(buffer)
                     print(readin)
                     buffer=''
@@ -297,6 +298,8 @@ def game_loop():
                 servoAngle = 0
             print "from main"
             print servoAngle
+            #servoAngle = arduino.readline().rstrip().rstrip("\r")
+            #servoAngle = servoAngle.replace('\r', '')
             if servoAngle > 0:
                 #if event.type == pygame.MOUSEBUTTONDOWN:
                 player.moving_up = True
