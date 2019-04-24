@@ -62,7 +62,7 @@ class Helicopter(object):
 
     def movement(self):
         speed = 6
-
+        rspeed = 30
         if not self.wreck_start:
             if (self.moving_up and self.moving_left) or (self.moving_down and self.moving_left):
                 speed *= 0.707
@@ -86,12 +86,12 @@ class Helicopter(object):
                 else:
                     servoAngle = 0
 		# normalizing 0-60 degrees from the servo to 8-15 speed for the chopper
-		max_servo_angle = 15
-		min_grip_speed = 8
-		max_grip_speed = 15
+		max_servo_angle = 10
+		min_grip_speed = 10
+		max_grip_speed = 20
 		grip_speed = (max_grip_speed-min_grip_speed)*(servoAngle / max_servo_angle) + min_grip_speed;
-		self.y -= grip_speed
-                #self.y -= speed # this will be removed once the above line is uncommented out 
+		#self.y -= grip_speed
+                self.y -= rspeed # this will be removed once the above line is uncommented out 
 
 
 

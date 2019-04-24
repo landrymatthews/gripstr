@@ -11,6 +11,7 @@ arduino = serial.Serial("/dev/ttyUSB0", timeout=1, baudrate=9600)
 # pygame __init__
 pygame.init()
 
+zs = 0
 # game display settings
 pygame.display.set_icon(sprites.icon)
 WINWIDTH = 800
@@ -280,9 +281,12 @@ def game_loop():
             FPSCLOCK.tick(10)
 
         # event handler
+        global zs
         if moving:
             buffer = ''
             readin = 0
+            
+            servoAngle = 0
             while not buffer.endswith('\n'):
                 try:
                     buffer = arduino.readline()
@@ -293,7 +297,7 @@ def game_loop():
                     print "error json"
             #readin = arduino.readline().rstrip().rstrip("\r")
             if readin: 
-                servoAngle = int(readin)
+                servoAngle = int(readin) 
             else:
                 servoAngle = 0
             print "from main"
@@ -305,9 +309,13 @@ def game_loop():
                 player.moving_up = True
                 player.moving_down = False
             if servoAngle == 0:
+                if zs >= 20:
                 #if event.type == pygame.MOUSEBUTTONUP:
-                player.moving_up = False
-                player.moving_down = True
+                    player.moving_up = False
+                    player.moving_down = True
+                else: 
+                    print zs
+                    zs += 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 if score > highscore_int:
